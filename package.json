@@ -1,0 +1,19 @@
+{
+  "name": "p2p-demo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "peer-2.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "b4a": "^1.6.7",
+    "corestore": "^7.0.23",
+    "derive-key": "^1.0.1",
+    "hypercore-crypto": "^3.5.0",
+    "hyperswarm": "^4.10.1",
+    "sodium": "^3.0.2"
+  }
+}
