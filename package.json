@@ -1,7 +1,7 @@
 {
   "name": "p2p-demo",
   "version": "1.0.0",
-  "description": "",
+  "description": "## RUN",
   "main": "peer-2.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -14,6 +14,8 @@
     "derive-key": "^1.0.1",
     "hypercore-crypto": "^3.5.0",
     "hyperswarm": "^4.10.1",
-    "sodium": "^3.0.2"
-  }
+    "sodium-universal": "^4.0.1"
+  },
+  "devDependencies": {},
+  "keywords": []
 }

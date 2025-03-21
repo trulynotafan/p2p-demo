@@ -5,45 +5,55 @@ const sodium = require('sodium-universal')
 const derive_seed = require('derive-key')
 const crypto = require("hypercore-crypto")
 
+start(process.argv.slice(2))
 
-async function start () {
-  const opts = { 
-    namespace: 'noisekeys', 
-    seed: crypto.randomBytes(32), 
-    name: 'noise' 
+/******************************************************************************
+  START
+******************************************************************************/
+async function start ([corekey]) {
+  if (!corekey) throw new Error('most provide a core key')
+
+  const opts = {
+    namespace: 'noisekeys',
+    seed: crypto.randomBytes(32),
+    name: 'noise'
   }
   const { publicKey, secretKey } = create_noise_keypair (opts)
-  console.log({ publicKey: publicKey.toString('hex')})
+
+  console.log({ peerkey: publicKey.toString('hex')})
+
   const keyPair = { publicKey, secretKey }
-  swarm = new Hyperswarm({ keyPair })
   const store = new Corestore('./storage-2')
-  
-  const key = 'a9cd94a4506dcc926bd62041eeef0de018df2b67162a321b6a6cf43b200e0c00'
-  const clonedCore = store.get(b4a.from(key, 'hex'))
+  const swarm = new Hyperswarm({ keyPair })
+  const clonedCore = store.get(b4a.from(corekey, 'hex'))
+  swarm.on('connection', onconnection)
+  clonedCore.on('append', onappend)
   await clonedCore.ready()
+  if (clonedCore.length) console.log('from cache:', { message: (await clonedCore.get(0)).toString('utf-8') })
 
-  console.log('Joining discovery key:', clonedCore.discoveryKey.toString('hex'))
+  const discovery_key = clonedCore.discoveryKey.toString('hex')
+  console.log('Joining swarm for discovery key:', { core: { key: corekey, discovery_key } })
+
   swarm.join(clonedCore.discoveryKey, { server: false, client: true })
-  setInterval(() => swarm.flush(), 5000)
+  swarm.flush()
+  // setInterval(() => swarm.flush(), 5000)
 
-  swarm.on('connection', async (socket, info) => {
+  return
+
+  async function onconnection (socket, info) {
     socket.on('error', (err) => console.log('socket error', err))
-    console.log({conn: 'onconnection', pubkey: info.publicKey.toString('hex')})
+    console.log({conn: 'onconnection', peerkey: info.publicKey.toString('hex')})
     store.replicate(socket)
-  })
-
-  clonedCore.on('append', async () => {
+  }
+  async function onappend () {
     console.log("📥 New data received!")
     const data = await clonedCore.get(0)
     console.log(`✅ Successfully fetched data: ${data}`)
-  })
-
+  }
 }
-
-start()
-
-///////////////////////
-
+/******************************************************************************
+  HELPER
+******************************************************************************/
 function create_noise_keypair ({ namespace, seed, name }) {
   const noiseSeed = derive_seed(namespace, seed, name)
   const publicKey = b4a.alloc(32)

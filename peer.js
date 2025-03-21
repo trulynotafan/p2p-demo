@@ -7,33 +7,39 @@ const crypto = require("hypercore-crypto")
 
 
 async function start () {
-  const opts = { 
-    namespace: 'noisekeys', 
-    seed: crypto.randomBytes(32), 
-    name: 'noise' 
+  const opts = {
+    namespace: 'noisekeys',
+    seed: crypto.randomBytes(32),
+    name: 'noise'
   }
   const { publicKey, secretKey } = create_noise_keypair (opts)
-  console.log({ publicKey: publicKey.toString('hex')})
+
+  console.log({ peerkey: publicKey.toString('hex')})
+
   const keyPair = { publicKey, secretKey }
-  swarm = new Hyperswarm({ keyPair })
   const store = new Corestore('./storage')
-  
+  const swarm = new Hyperswarm({ keyPair })
+  swarm.on('connection', onconnection)
   const core = store.get({ name: 'test-core' })
   await core.ready()
+
   console.log(`✅ Successfully created a new core with the key`)
-  console.log({ key: core.key.toString('hex') })
+  console.log({ corekey: core.key.toString('hex') })
+
   await core.append('Hello , agent')
 
   console.log('Joining discovery key:', core.discoveryKey.toString('hex'))
+
   const discovery = swarm.join(core.discoveryKey, { server: true, client: false })
   await discovery.flushed()
 
-  swarm.on('connection', async (socket, info) => {
+  return
+
+  async function onconnection (socket, info) {
     socket.on('error', (err) => console.log('socket error', err))
     console.log({conn: 'onconnection', pubkey: info.publicKey.toString('hex')})
     store.replicate(socket)
-  })
-
+  }
 }
 
 start()
