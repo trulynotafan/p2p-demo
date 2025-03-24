@@ -1,13 +1,10 @@
 {
   "name": "p2p-demo",
-  "version": "1.0.0",
-  "description": "## RUN",
-  "main": "peer-2.js",
+  "version": "0.0.1-demo",
+  "description": "peer to peer demo",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "reset": "rm -rf ./storage*"
   },
-  "author": "",
-  "license": "MIT",
   "dependencies": {
     "b4a": "^1.6.7",
     "corestore": "^7.0.23",
@@ -16,6 +13,5 @@
     "hyperswarm": "^4.10.1",
     "sodium-universal": "^4.0.1"
   },
-  "devDependencies": {},
-  "keywords": []
+  "license": "MIT"
 }
