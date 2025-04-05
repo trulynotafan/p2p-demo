@@ -1,0 +1,68 @@
+P2P demo; my understanding so far:
+a way to communicate from a peer (computer) to another peer for the exchange of information.
+Without relying on a central server somewhat like crypto which doesn't require a bank for the transactions.
+We have two files in this demo; one is writer.js and the other is reader.js.
+Writer is for initiating the communication process, whereas reader is used for communication to this device.
+The writer peer generates a core key which is then used by the reader peer to connect to the peer.  
+
+Now the code itself:  
+
+reader-peer.js:
+First, we have 6 dependencies:  
+
+b4a (for easy handling of raw binary data, as in this code we rely on cryptographic data which requires handling at byte level).
+corestore (I believe it is some sort of a temporary storage providing tool so we can store our keys and whatnot).
+hyperswarm (used for identifying peers and connecting to them, sort of like matchmaking in video games, I guess).
+sodium (some sort of encryption tool; it creates unique signatures for the keys and makes sure the key is coming from the right path).
+derive seed (is essentially used to generate a seed from certain inputs like a namespace, seed value, and name).
+crypto (handle cryptographic things like creating pairs and validating).
+Next, we start using the start function.
+We make a green label variable that has the text "writer."
+We log the start word.
+We create the opts object for parameters of key generation.
+First, we have namespace for grouping related keys, for security, I guess.
+Then we create a 32-byte random seed for key pair generation.
+After that, we give it a name attribute.
+Then we will create an object with two things: public and private key, and we assign it using the function create_noise_keypair.
+The function basically takes all three attributes of the object as params and creates a noise seed by combining the three attributes using the derive seed module.
+Then, we create keys using b4a.
+We then use sodium and check if we have noise seed.
+If we call a method from the sodium library that secures the keys, if noise seed doesn't exist, it just creates keys without using crypto_sign_keypair.  
+
+After getting the key pair, we create local storage using corestore and a swarm using hyperswarm.
+The connect function waits for a connection between peers; if a connection is made, the onconnection function is called.
+Within the onconnection function:
+It listens for any errors (socket.on('error', onerror)).
+It logs the public key of the connected peer (info.publicKey.toString('hex')).
+It uses store.replicate(socket) to replicate the data across the peer.
+Then, it starts the append_more function at regular intervals (every second), which keeps appending the system's uptime to the core (basically updating the data that gets replicated).
+If an error occurs, the onerror function is triggered, which clears the interval and logs the socket error.
+The append_more function is the part that adds the current uptime to the core.
+It calculates the system's uptime (in hours, minutes, and seconds) and appends it to the core.  
+
+After all this, the program finishes by logging that the peer is successfully connected and that it has appended data to the core.  
+
+So overall, what happens here is:
+The writer peer creates a core key and starts a decentralized connection using hyperswarm.
+The reader peer connects to the writer peer using that core key and starts receiving and appending data, such as uptime, from the writer.
+Data is securely shared between peers using cryptographic keys and verified using sodium.
+The entire communication is decentralized, with no central server involved.
+
+Now for reader-peer.js:
+Start function initiates the process.
+Create an opts object with a namespace, a random 32-byte seed, and a name.
+Call create_noise_keypair to generate public and secret keys.
+Set up Corestore and Hyperswarm for local storage and peer connections.
+Create a new store locally using Corestore at ./storage-${name}.
+Hyperswarm discovers peers and joins a swarm based on the core key from the command line.
+Connect to the reader peer using the discovery key from the core.
+Trigger onconnection when a connection is made.
+If successful, replicate data between peers using store.replicate(socket).
+Download available data from the core and log it.
+Automatically download and display any new data appended to the core.
+Helper functions:
+create_noise_keypair: Generates keys using the namespace, seed, and name.
+parse: Extracts command-line options.
+validate: Checks for required flags like --name and --corekey.
+In summary, the script validates input, generates keys, initializes Corestore and Hyperswarm, downloads logs, joins the swarm, and waits for peer connections to share data smoothly.
+Now time for porting this into bare runtime, though I first have to get familiar with bare runtime. 
