@@ -2,17 +2,17 @@ const b4a = require('b4a')
 const Corestore = require('corestore')
 const Hyperswarm = require('hyperswarm')
 const sodium = require('sodium-universal')
-const derive_seed = require('derive-key')
 const crypto = require("hypercore-crypto")
+const process = require("bare-process") //new module.
 
-start(parse(process.argv.slice(2)))
+start(parse(Bare.argv.slice(2))) //bare uses Bare.argv instead of process.argv
 
 /******************************************************************************
   START
 ******************************************************************************/
 async function start (args, flag) {
   const { '--corekey': corekey, '--name': name } = validate(args)
-  const label = `\x1b[${process.pid % 2 ? 31 : 34}m[peer-${name}]\x1b[0m`
+  const label = `\x1b[${process.pid % 2 ? 31 : 34}m[peer-${name}]\x1b[0m` //process.pid is available in bare-process XD
   console.log(label, 'start')
   const opts = {
     namespace: 'noisekeys',
@@ -72,13 +72,24 @@ async function start (args, flag) {
   HELPER
 ******************************************************************************/
 function create_noise_keypair ({ namespace, seed, name }) {
-  const noiseSeed = derive_seed(namespace, seed, name)
+  const noiseSeed = deriveSeed(namespace, seed, name)
   const publicKey = b4a.alloc(32)
   const secretKey = b4a.alloc(64)
   if (noiseSeed) sodium.crypto_sign_seed_keypair(publicKey, secretKey, noiseSeed)
   else sodium.crypto_sign_keypair(publicKey, secretKey)
   return { publicKey, secretKey }
 }
+
+function deriveSeed (primaryKey, namespace, name) {
+
+  if (!b4a.isBuffer(namespace)) namespace = b4a.from(namespace) //Making sure that all three arguments are a valid buffer. Also I did compare the seed with derive-key, both generate a valid seed.
+  if (!b4a.isBuffer(name)) name = b4a.from(name)
+  if (!b4a.isBuffer(primaryKey)) primaryKey = b4a.from(primaryKey) 
+  const out = b4a.alloc(32) 
+  sodium.crypto_generichash_batch(out, [namespace, name, primaryKey])
+  return out
+}
+
 function parse (L) {
   const arr = []
   for (var i = 0; i < L.length; i += 2) arr.push([L[i], L[i+1]])
