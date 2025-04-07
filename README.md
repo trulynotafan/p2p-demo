@@ -5,7 +5,7 @@ Node Package Manager (NPM)
 Bare Install via `npm install -g bare`
 
 ## RUN
-
+First run `npm install` to install all the packages.
 ### 1. run wrtier peer
 e.g.: ` bare writer-peer.js`
 ```bash
