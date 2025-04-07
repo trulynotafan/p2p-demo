@@ -3,7 +3,7 @@ const Corestore = require('corestore')
 const Hyperswarm = require('hyperswarm')
 const sodium = require('sodium-universal')
 const crypto = require("hypercore-crypto")
-const process = require("bare-process") //new module for uptime, though we can use simple counter. But the counter 
+const process = require("bare-process") //new module for uptime, though we can use simple counter. But this looks more easy and accurate. 
 
 start()
 
