@@ -1,17 +1,17 @@
 {
   "name": "p2p-demo",
   "version": "0.0.1-demo",
-  "description": "peer to peer demo",
+  "description": "peer to peer demo but with bare",
   "scripts": {
     "reset": "rm -rf ./storage*"
   },
   "dependencies": {
     "b4a": "^1.6.7",
     "corestore": "^7.0.23",
-    "derive-key": "^1.0.1",
     "hypercore-crypto": "^3.5.0",
     "hyperswarm": "^4.10.1",
-    "sodium-universal": "^4.0.1"
-  },
+    "sodium-universal": "^4.0.1",
+    "bare-process": "^4.1.2"
+    },
   "license": "MIT"
 }
