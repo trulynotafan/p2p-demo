@@ -1,9 +1,13 @@
-# Demo of a p2p exchange using Hyperswarm, Corestore and Hypercore by Holepunch
+# Demo of a p2p exchange using Hyperswarm, Corestore and Hypercore by Holepunch (Using Bare runtime)
+#  Prerequisites
+Node Package Manager (NPM)
+
+Bare Install via `npm install -g bare`
 
 ## RUN
 
 ### 1. run wrtier peer
-e.g.: `node writer-peer.js`
+e.g.: ` bare writer-peer.js`
 ```bash
 [writer] start
 [writer] {
@@ -14,10 +18,10 @@ e.g.: `node writer-peer.js`
   corekey: '36a08a0c9ea507cf767dff65e5038bbefbd93c6540605acee1167763fd9f3c88'
 }
 ```
-=> copy the logged `corekey` to peer-2.js file
+=> copy the logged `corekey` to peer-2.js file.
 
 ### 2. run reader peer
-e.g.: `node reader-peer.js --name bob --corekey 0944e627af376eb0969f0507587de8e42f0943140286fdf0c6022a87dea3394f`
+e.g.: `bare reader-peer.js --name bob --corekey 0944e627af376eb0969f0507587de8e42f0943140286fdf0c6022a87dea3394f`
 ```bash
 [peer-bob] start
 [peer-bob] {
@@ -36,7 +40,7 @@ e.g.: `node reader-peer.js --name bob --corekey 0944e627af376eb0969f0507587de8e4
 ```
 
 ### 3. run another reader peer
-e.g.: `node reader-peer.js --name amy --corekey 0944e627af376eb0969f0507587de8e42f0943140286fdf0c6022a87dea3394f`
+e.g.: `bare reader-peer.js --name amy --corekey 0944e627af376eb0969f0507587de8e42f0943140286fdf0c6022a87dea3394f`
 ```bash
 [peer-amy] start
 [peer-amy] {
